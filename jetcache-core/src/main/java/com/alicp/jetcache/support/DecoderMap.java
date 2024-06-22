@@ -58,7 +58,7 @@ public class DecoderMap {
             register(SerialPolicy.IDENTITY_NUMBER_JAVA, defaultJavaValueDecoder());
             register(SerialPolicy.IDENTITY_NUMBER_KRYO4, KryoValueDecoder.INSTANCE);
             register(SerialPolicy.IDENTITY_NUMBER_KRYO5, Kryo5ValueDecoder.INSTANCE);
-            // register(SerialPolicy.IDENTITY_NUMBER_FASTJSON2, Fastjson2ValueDecoder.INSTANCE);
+             register(SerialPolicy.IDENTITY_NUMBER_FASTJSON2, Fastjson2ValueDecoder.INSTANCE);
             inited = true;
         } finally {
             reentrantLock.unlock();

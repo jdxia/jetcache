@@ -8,13 +8,10 @@ import com.alicp.jetcache.anno.KeyConvertor;
 
 import java.io.IOException;
 
-/**
- * Created on 2016/10/8.
- *
- * @author huangli
- */
+// 远程缓存, 看子类
 public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
 
+    // 缓存实例对象远程缓存的配置信息ExternalCacheConfig对象，提供了将缓存key转换成字节数组的方法
     private ExternalCacheConfig<K, V> config;
 
     public AbstractExternalCache(ExternalCacheConfig<K, V> config) {

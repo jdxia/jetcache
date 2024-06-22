@@ -36,6 +36,7 @@ class CreateCacheWrapper {
     private RefreshPolicy refreshPolicy;
     private PenetrationProtectConfig protectConfig;
 
+    // 创建cache对象
     public CreateCacheWrapper(ConfigurableListableBeanFactory beanFactory, CreateCache ann, Field field) {
         this.beanFactory = beanFactory;
         this.ann = ann;
@@ -48,6 +49,7 @@ class CreateCacheWrapper {
         if (penetrateProtect != null) {
             protectConfig = CacheConfigUtil.parsePenetrationProtectConfig(penetrateProtect);
         }
+        // 初始化
         init();
     }
 

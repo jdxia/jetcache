@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Role;
  */
 @Configuration
 public class CommonConfiguration {
+
+    //保存方法与缓存注解配置信息的映射关系
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public ConfigMap jetcacheConfigMap() {

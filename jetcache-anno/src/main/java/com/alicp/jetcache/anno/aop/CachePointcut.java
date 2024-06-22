@@ -26,11 +26,22 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
     private ConfigMap cacheConfigMap;
     private String[] basePackages;
 
+    /**
+     * 构造函数
+     *
+     * @param basePackages 基础包名数组
+     */
     public CachePointcut(String[] basePackages) {
         setClassFilter(this);
         this.basePackages = basePackages;
     }
 
+    /**
+     * 判断类是否匹配
+     *
+     * @param clazz 类对象
+     * @return 是否匹配
+     */
     @Override
     public boolean matches(Class clazz) {
         boolean b = matchesImpl(clazz);
@@ -38,6 +49,12 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
         return b;
     }
 
+    /**
+     * 实现类是否匹配
+     *
+     * @param clazz 类对象
+     * @return 是否匹配
+     */
     private boolean matchesImpl(Class clazz) {
         if (matchesThis(clazz)) {
             return true;
@@ -59,6 +76,12 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
         return false;
     }
 
+    /**
+     * 判断类是否匹配
+     *
+     * @param clazz 类对象
+     * @return 是否匹配
+     */
     public boolean matchesThis(Class clazz) {
         String name = clazz.getName();
         if (exclude(name)) {
@@ -67,6 +90,12 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
         return include(name);
     }
 
+    /**
+     * 判断类是否包含在基础包名数组中
+     *
+     * @param name 类名
+     * @return 是否包含
+     */
     private boolean include(String name) {
         if (basePackages != null) {
             for (String p : basePackages) {
@@ -78,6 +107,7 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
         return false;
     }
 
+    // 这些要排除掉
     private boolean exclude(String name) {
         if (name.startsWith("java")) {
             return true;
@@ -94,6 +124,13 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
         return false;
     }
 
+    /**
+     * 判断给定的方法是否与目标类匹配
+     *
+     * @param method 待判断的方法
+     * @param targetClass 目标类
+     * @return 如果匹配则返回true，否则返回false
+     */
     @Override
     public boolean matches(Method method, Class targetClass) {
         boolean b = matchesImpl(method, targetClass);
@@ -115,6 +152,18 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
         return b;
     }
 
+    /**
+     * 实现方法匹配的逻辑
+     * @param method 待判断的方法
+     * @param targetClass 目标类
+     * @return 如果匹配则返回true，否则返回false
+     *
+     *
+     * 1、调用matchesThis函数判断指定的类的包名是否以配置的JetCache扫描的包路径开头，这是为了排除没有JetCache不会扫描的类。
+     * 2、调用exclude函数用于排除Java和Spring自带的类名，以及使用CGLIB动态代理生成的类。
+     * 3、根据类和函数信息生成唯一键Key，然后查询缓存cacheConfigMap中对应的缓存调用配置信息。
+     * 4、如果cacheConfigMap缺少指定类的指定函数的缓存调用配置信息，则构建CacheInvokeConfig实例，并解析函数的注解信
+     */
     private boolean matchesImpl(Method method, Class targetClass) {
         if (!matchesThis(method.getDeclaringClass())) {
             return false;
@@ -174,6 +223,7 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
             Method[] methods = clazz.getDeclaredMethods();
             for (Method method : methods) {
                 if (methodMatch(name, method, paramTypes)) {
+                    // 会解析函数上的Cached、CacheUpdate和CacheInvalidate注解上的信息
                     CacheConfigUtil.parse(cac, method);
                     break;
                 }

@@ -18,18 +18,24 @@ import java.time.Duration;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-/**
- * Created on 2016/11/29.
- *
- * @author huangli
- */
+// 配置提供者对象, 继承了AbstractLifecycle，走doInit
 public class ConfigProvider extends AbstractLifecycle {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigProvider.class);
 
+    /**
+     * 缓存的全局配置
+     */
     protected GlobalCacheConfig globalCacheConfig;
 
+    /**
+     * 根据不同类型生成缓存数据转换函数的转换器
+     */
     protected EncoderParser encoderParser;
+
+    /**
+     * 根据不同类型生成缓存 Key 转换函数的转换器
+     */
     protected KeyConvertorParser keyConvertorParser;
     private Consumer<StatInfo> metricsCallback;
 
@@ -41,6 +47,11 @@ public class ConfigProvider extends AbstractLifecycle {
         metricsCallback = new StatInfoLogger(false);
     }
 
+    /**
+     * 先创建cacheBuilderTemplate，之后根据globalCacheConfig.getLocalCacheBuilders()去设置setKeyConvertor，
+     * 根据globalCacheConfig.getRemoteCacheBuilders()设置setKeyConvertor、setValueEncoder、setValueDecoder，
+     * 最后执行initCacheMonitorInstallers方法
+     */
     @Override
     protected void doInit() {
         cacheBuilderTemplate = new CacheBuilderTemplate(globalCacheConfig.isPenetrationProtect(),
@@ -67,13 +78,21 @@ public class ConfigProvider extends AbstractLifecycle {
                 eb.setValueDecoder(parseValueDecoder(f.getValue()));
             }
         }
+        // 启动缓存指标监控器，周期性打印各项指标
         initCacheMonitorInstallers();
     }
 
+    /**
+     * 会执行metricsMonitorInstaller、notifyMonitorInstaller并添加到cacheBuilderTemplate.getCacheMonitorInstallers()，
+     * 最后遍历cacheBuilderTemplate.getCacheMonitorInstallers()对于是AbstractLifecycle类型的挨个执行init方法
+     * metricsMonitorInstaller方法创建MetricsMonitorInstaller并执行其init方法
+     */
     protected void initCacheMonitorInstallers() {
         cacheBuilderTemplate.getCacheMonitorInstallers().add(metricsMonitorInstaller());
         cacheBuilderTemplate.getCacheMonitorInstallers().add(notifyMonitorInstaller());
         for (CacheMonitorInstaller i : cacheBuilderTemplate.getCacheMonitorInstallers()) {
+            // NotifyMonitorInstaller 没有实现 AbstractLifecycle 接口
+            // metricsMonitorInstaller 做了 init
             if (i instanceof AbstractLifecycle) {
                 ((AbstractLifecycle) i).init();
             }
@@ -121,6 +140,12 @@ public class ConfigProvider extends AbstractLifecycle {
     }
 
     /**
+     * 根据解码类型通过缓存value转换器生成解码函数
+     *
+     * @param valueDecoder 解码类型
+     * @return 解码函数
+     */
+    /**
      * Keep this method for backward compatibility.
      * NOTICE: there is no getter for encoderParser.
      */
@@ -128,6 +153,12 @@ public class ConfigProvider extends AbstractLifecycle {
         return encoderParser.parseDecoder(valueDecoder);
     }
 
+    /**
+     * 根据转换类型通过缓存key转换器生成转换函数
+     *
+     * @param convertor 转换类型
+     * @return 转换函数
+     */
     /**
      * Keep this method for backward compatibility.
      * NOTICE: there is no getter for keyConvertorParser.

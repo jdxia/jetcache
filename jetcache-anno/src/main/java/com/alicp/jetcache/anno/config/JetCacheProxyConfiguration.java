@@ -13,11 +13,7 @@ import org.springframework.context.annotation.Role;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 
-/**
- * Created on 2016/11/16.
- *
- * @author huangli
- */
+
 @Configuration
 public class JetCacheProxyConfiguration implements ImportAware, ApplicationContextAware {
 
@@ -26,6 +22,7 @@ public class JetCacheProxyConfiguration implements ImportAware, ApplicationConte
 
     @Override
     public void setImportMetadata(AnnotationMetadata importMetadata) {
+        // 获取 @EnableMethodCache 注解信息
         this.enableMethodCache = AnnotationAttributes.fromMap(
                 importMetadata.getAnnotationAttributes(EnableMethodCache.class.getName(), false));
         if (this.enableMethodCache == null) {
@@ -39,16 +36,33 @@ public class JetCacheProxyConfiguration implements ImportAware, ApplicationConte
         this.applicationContext = applicationContext;
     }
 
+    /**
+     * bean的名称：jetcache2.internalCacheAdvisor
+     *
+     * 创建一个名为CACHE_ADVISOR_BEAN_NAME的CacheAdvisor Bean，并设置其角色为BeanDefinition.ROLE_INFRASTRUCTURE。
+     * 使用JetCacheInterceptor创建CacheAdvisor的缓存拦截器。
+     * 设置CacheAdvisor的缓存拦截器为jetCacheInterceptor。
+     * 设置CacheAdvisor的基包为enableMethodCache.getStringArray("basePackages")。
+     * 设置CacheAdvisor的顺序为enableMethodCache.getNumber("order")。
+     * 返回创建的CacheAdvisor Bean。
+     */
     @Bean(name = CacheAdvisor.CACHE_ADVISOR_BEAN_NAME)
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public CacheAdvisor jetcacheAdvisor(JetCacheInterceptor jetCacheInterceptor) {
         CacheAdvisor advisor = new CacheAdvisor();
+        // 设置缓存拦截器为 JetCacheInterceptor
         advisor.setAdvice(jetCacheInterceptor);
+        // 设置需要扫描的包
         advisor.setBasePackages(this.enableMethodCache.getStringArray("basePackages"));
+        // 设置优先级，默认 Integer 的最大值，最低优先级
         advisor.setOrder(this.enableMethodCache.<Integer>getNumber("order"));
         return advisor;
     }
 
+    /**
+     * 创建一个名为jetCacheInterceptor的JetCacheInterceptor Bean，并设置其角色为BeanDefinition.ROLE_INFRASTRUCTURE。
+     * 返回创建的JetCacheInterceptor Bean。
+     */
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public JetCacheInterceptor jetCacheInterceptor() {

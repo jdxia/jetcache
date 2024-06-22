@@ -47,6 +47,7 @@ public class RedisAutoConfiguration {
     }
 
     public static class RedisCondition extends JetCacheCondition {
+        // 配置了缓存类型为 redis 当前类才会被注入 Spring 容器
         public RedisCondition() {
             super("redis");
         }
@@ -54,15 +55,24 @@ public class RedisAutoConfiguration {
 
     public static class RedisAutoInit extends ExternalCacheAutoInit {
         public RedisAutoInit() {
+            // 设置缓存类型
             super("redis");
         }
 
         @Autowired
         private AutoConfigureBeans autoConfigureBeans;
 
+        /**
+         * 先解析Redis的相关配置
+         * 通过Jedis创建Redis连接池
+         * 通过RedisCacheBuilder创建一个默认实现类
+         * 解析相关配置至构造器中完成初始化
+         * 将Redis连接保存至AutoConfigureBeans中
+         */
         @Override
         protected CacheBuilder initCache(ConfigTree ct, String cacheAreaWithPrefix) {
             Object jedisObj = parsePool(ct);
+            // 是否只从 Redis 的从节点读取数据
             boolean readFromSlave = Boolean.parseBoolean(ct.getProperty("readFromSlave", "False"));
 
             RedisCacheBuilder.RedisCacheBuilderImpl builder = RedisCacheBuilder.createRedisCacheBuilder()
@@ -73,8 +83,10 @@ public class RedisAutoConfiguration {
                 builder.jedis((UnifiedJedis) jedisObj);
             }
 
+            // 获取从节点的配置信息
             ConfigTree slaves = ct.subTree("slaves.");
             Set<String> slaveNames = slaves.directChildrenKeys();
+            // 依次创建每个从节点的连接池
             if (slaveNames.size() > 0) {
                 List<Object> slavesObjects = new ArrayList<>();
                 int[] slavesWeights = new int[slaveNames.size()];
@@ -94,6 +106,7 @@ public class RedisAutoConfiguration {
                 }
             }
 
+            // 解析相关配置至 RedisCacheBuilder 的 CacheConfig 中
             parseGeneralConfig(builder, ct);
 
             // eg: "jedisPool.remote.default"
@@ -105,7 +118,14 @@ public class RedisAutoConfiguration {
             return builder;
         }
 
+        /**
+         * 创建 Redis 连接池
+         *
+         * @param ct 配置信息
+         * @return 连接池
+         */
         private Object parsePool(ConfigTree ct) {
+            // 创建连接池配置对象
             GenericObjectPoolConfig poolConfig = parsePoolConfig(ct);
 
             Map<String, Object> cluster = ct.subTree("cluster"/*there is no dot*/).getProperties();
@@ -129,6 +149,7 @@ public class RedisAutoConfiguration {
                     if (port == 0) {
                         throw new IllegalStateException("port is required");
                     }
+                    // 创建一个 Jedis 连接池
                     return new JedisPool(poolConfig, host, port, connectionTimeout, soTimeout, user, password,
                             database, clientName, ssl);
                 } else {
@@ -155,6 +176,7 @@ public class RedisAutoConfiguration {
                         sentinelsSet.add(s.trim());
                     }
                 }
+                // 创建一个 Jedis Sentine 连接池
                 return new JedisSentinelPool(masterName, sentinelsSet, poolConfig, connectionTimeout, soTimeout,
                         user, password, database, clientName, sentinelConnectionTimeout, sentinelSoTimeout,
                         sentinelUser, sentinelPassword, sentinelClientName);

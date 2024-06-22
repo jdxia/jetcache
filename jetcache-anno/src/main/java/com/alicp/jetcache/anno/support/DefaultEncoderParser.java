@@ -5,12 +5,7 @@ package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.anno.SerialPolicy;
-import com.alicp.jetcache.support.JavaValueDecoder;
-import com.alicp.jetcache.support.JavaValueEncoder;
-import com.alicp.jetcache.support.Kryo5ValueDecoder;
-import com.alicp.jetcache.support.Kryo5ValueEncoder;
-import com.alicp.jetcache.support.KryoValueDecoder;
-import com.alicp.jetcache.support.KryoValueEncoder;
+import com.alicp.jetcache.support.*;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -56,9 +51,9 @@ public class DefaultEncoderParser implements EncoderParser {
             return new JavaValueEncoder(useIdentityNumber);
         } else if (SerialPolicy.KRYO5.equalsIgnoreCase(valueEncoder)) {
             return new Kryo5ValueEncoder(useIdentityNumber);
-        }/* else if (SerialPolicy.FASTJSON2.equalsIgnoreCase(valueEncoder)) {
+        } else if (SerialPolicy.FASTJSON2.equalsIgnoreCase(valueEncoder)) {
             return new Fastjson2ValueEncoder(useIdentityNumber);
-        }*/ else {
+        }else {
             throw new CacheConfigException("not supported:" + valueEncoder);
         }
     }
@@ -87,9 +82,9 @@ public class DefaultEncoderParser implements EncoderParser {
             return javaValueDecoder(useIdentityNumber);
         } else if (SerialPolicy.KRYO5.equalsIgnoreCase(valueDecoder)) {
             return new Kryo5ValueDecoder(useIdentityNumber);
-        }/* else if (SerialPolicy.FASTJSON2.equalsIgnoreCase(valueDecoder)) {
-            return new Kryo5ValueDecoder(useIdentityNumber);
-        }*/ else {
+        } else if (SerialPolicy.FASTJSON2.equalsIgnoreCase(valueDecoder)) {
+            return new Fastjson2ValueDecoder(useIdentityNumber);
+        } else {
             throw new CacheConfigException("not supported:" + valueDecoder);
         }
     }

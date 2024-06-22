@@ -1,0 +1,89 @@
+server:
+  port: 8083
+  tomcat:
+    uri-encoding: UTF-8
+  shutdown: graceful
+
+spring:
+  application:
+    name: jetcache-demo
+  main:
+    allow-circular-references: true
+    banner-mode: off
+  #redisson 集群配置
+  redis:
+    redisson:
+      config: |
+        clusterServersConfig:
+          idleConnectionTimeout: 10000
+          connectTimeout: 10000
+          timeout: 3000
+          retryAttempts: 3
+          retryInterval: 1500
+          failedSlaveReconnectionInterval: 3000
+          failedSlaveNodeDetector: !<org.redisson.client.FailedConnectionDetector> {}
+          password: "Winter123"
+          subscriptionsPerConnection: 5
+          clientName: null
+          loadBalancer: !<org.redisson.connection.balancer.RoundRobinLoadBalancer> {}
+          subscriptionConnectionMinimumIdleSize: 1
+          subscriptionConnectionPoolSize: 50
+          slaveConnectionMinimumIdleSize: 24
+          slaveConnectionPoolSize: 64
+          masterConnectionMinimumIdleSize: 24
+          masterConnectionPoolSize: 64
+          readMode: "SLAVE"
+          subscriptionMode: "SLAVE"
+          nodeAddresses:
+          - "redis://172.30.97.10:6381"
+          - "redis://172.30.97.10:6382"
+          - "redis://172.30.97.10:6383"
+          - "redis://172.30.97.10:6384"
+          - "redis://172.30.97.10:6385"
+          - "redis://172.30.97.10:6386"
+          scanInterval: 1000
+          pingConnectionInterval: 0
+          keepAlive: false
+          tcpNoDelay: false
+        threads: 16
+        nettyThreads: 32
+        transportMode: "NIO"
+
+
+jetcache:
+  statIntervalMinutes: 15
+  areaInCacheName: false
+  local:
+    default:
+      type: caffeine
+      limit: 100
+      keyConvertor: fastjson2
+      valueEncoder: java
+      valueDecoder: java
+#      expireAfterWriteInMillis: 100000
+#  remote:
+#    default:
+#      type: redis
+##      expireAfterWriteInMillis: 50000
+#      keyConvertor: fastjson2
+#      broadcastChannel: projectA
+#      valueEncoder: java
+#      valueDecoder: java
+#      poolConfig:
+#        minIdle: 5
+#        maxIdle: 20
+#        maxTotal: 50
+#      host: 127.0.0.1
+#      port: 6379
+#      password: root
+  remote:
+    default:
+      type: redisson
+#      redissonClient: redisClientBeanName
+      #      expireAfterWriteInMillis: 50000
+      keyConvertor: fastjson2
+      broadcastChannel: projectA
+      valueEncoder: java
+      valueDecoder: java
+      keyPrefix: px-jetcache-
+#      defaultExpireInMillis: 10000

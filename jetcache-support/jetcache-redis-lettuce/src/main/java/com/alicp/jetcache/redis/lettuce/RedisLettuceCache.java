@@ -40,12 +40,15 @@ import java.util.function.Function;
  */
 public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
 
+    // 配置对象，包含Redis客户端、与Redis建立的安全连接等信息
     private final RedisLettuceCacheConfig<K, V> config;
 
     private final Function<Object, byte[]> valueEncoder;
     private final Function<byte[], Object> valueDecoder;
 
     private final AbstractRedisClient client;
+
+    // 自定义管理器将与Redis连接的相关信息封装成LettuceObjects对象，并管理RedisClient与LettuceObjects对应关系
     private final LettuceConnectionManager lettuceConnectionManager;
     private final RedisStringCommands<byte[], byte[]> stringCommands;
     private final RedisStringAsyncCommands<byte[], byte[]> stringAsyncCommands;

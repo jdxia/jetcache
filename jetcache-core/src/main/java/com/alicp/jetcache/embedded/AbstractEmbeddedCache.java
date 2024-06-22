@@ -17,8 +17,14 @@ import java.util.stream.Collectors;
 /**
  * @author huangli
  */
+//定义了本地缓存的存放缓存数据的对象为com.alicp.jetcache.embedded.InnerMap接口和一个初始化该接口的createAreaCache抽象方法，
+// 基于InnerMap接口实现以DO_开头的方法，完成缓存实例各种操作的具体实现
 public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     protected EmbeddedCacheConfig<K, V> config;
+    /**
+     * 本地缓存map, 缓存实例对象本地缓存基于内存操作缓存数据的InnerMap对象
+     * 它的初始化过程交由不同的内存缓存实例（LinkedHashMapCache和CaffeineCache）
+     */
     protected InnerMap innerMap;
 
     protected abstract InnerMap createAreaCache();
@@ -67,6 +73,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
                         return CacheGetResult.EXPIRED_WITHOUT_MSG;
                     }
                 }
+                // 设置该缓存数据的最后一次访问时间
                 holder.setAccessTime(now);
             }finally {
                 lock.unlock();

@@ -31,6 +31,7 @@
         <module>jetcache-starter/jetcache-starter-redis-lettuce</module>
         <module>jetcache-starter/jetcache-starter-redis-springdata</module>
         <module>jetcache-starter/jetcache-starter-redisson</module>
+        <module>jetcache-demo</module>
     </modules>
 
     <licenses>

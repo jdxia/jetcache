@@ -11,6 +11,10 @@ import com.alicp.jetcache.Cache;
  * @author huangli
  */
 public class CacheEvent {
+    /**
+     * 它有CacheGetEvent、CacheGetAllEvent、CacheLoadEvent、CacheLoadAllEvent、CachePutEvent、
+     * CachePutAllEvent、CacheRemoveEvent、CacheRemoveAllEvent这几个子类
+     */
 
     protected Cache cache;
 

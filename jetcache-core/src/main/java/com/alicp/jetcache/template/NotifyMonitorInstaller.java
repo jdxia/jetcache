@@ -34,16 +34,21 @@ public class NotifyMonitorInstaller implements CacheMonitorInstaller {
         if (!(CacheUtil.getAbstractCache(cache) instanceof MultiLevelCache)) {
             return;
         }
-        String area = quickConfig.getArea();
-        final ExternalCacheBuilder cacheBuilder = (ExternalCacheBuilder) remoteBuilderTemplate.apply(area);
+        String area = quickConfig.getArea(); // 默认default
+        final ExternalCacheBuilder cacheBuilder = (ExternalCacheBuilder) remoteBuilderTemplate.apply(area); //如果配置的redisson, 那这就是redissonBuilder
+        // 看这个cache支不支持广播, cacheBuilder不能为空, 并且要有广播channel
         if (cacheBuilder == null || !cacheBuilder.supportBroadcast()
                 || cacheBuilder.getConfig().getBroadcastChannel() == null) {
             return;
         }
 
-        if (cacheManager.getBroadcastManager(area) == null) {
+        if (cacheManager.getBroadcastManager(area) == null) {  // 一开始null
+            /**
+             * 如果用的是redission的话, 这边会走这里创建一个BroadcastManager
+             * {@link com.alicp.jetcache.redisson.RedissonCacheBuilder#createBroadcastManager(CacheManager)}
+             */
             BroadcastManager cm = cacheBuilder.createBroadcastManager(cacheManager);
-            if (cm != null) {
+            if (cm != null) { // 不是null了
                 cm.startSubscribe();
                 cacheManager.putBroadcastManager(area, cm);
             }

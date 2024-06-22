@@ -19,9 +19,7 @@ import com.alicp.jetcache.event.CacheRemoveEvent;
 
 import java.util.function.Function;
 
-/**
- * @author huangli
- */
+// 根据不同的event具体类型来构建不同的type的CacheMessage，最后通过broadcastManager.publish(m)去发布消息
 public class CacheNotifyMonitor implements CacheMonitor {
     private final BroadcastManager broadcastManager;
     private final String area;
@@ -29,6 +27,7 @@ public class CacheNotifyMonitor implements CacheMonitor {
     private final String sourceId;
 
     public CacheNotifyMonitor(CacheManager cacheManager, String area, String cacheName) {
+        // 通过cacheManager获取broadcastManager
         this.broadcastManager = cacheManager.getBroadcastManager(area);
         this.area = area;
         this.cacheName = cacheName;
@@ -66,6 +65,7 @@ public class CacheNotifyMonitor implements CacheMonitor {
 
     @Override
     public void afterOperation(CacheEvent event) {
+        // 对于broadcastManager为null或者cache是close的或者localCache为null不做处理
         if (this.broadcastManager == null) {
             return;
         }
@@ -77,6 +77,8 @@ public class CacheNotifyMonitor implements CacheMonitor {
         if (localCache == null) {
             return;
         }
+
+        // 根据不同的event具体类型来构建不同的type的CacheMessage，最后通过broadcastManager.publish(m)去发布消息
         if (event instanceof CachePutEvent) {
             CacheMessage m = new CacheMessage();
             m.setArea(area);

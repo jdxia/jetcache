@@ -21,15 +21,14 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Created on 2016/10/27.
- *
- * @author huangli
+ * 实现了CacheMonitor接口，其afterOperation方法根据CacheEvent的具体类型来执行不同的处理逻辑，主要是维护CacheStat的相关属性
  */
 public class DefaultCacheMonitor implements CacheMonitor {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultCacheMonitor.class);
 
     private final ReentrantLock reentrantLock = new ReentrantLock();
+    // 定义了get、put、remove、load这几类动作的相关指标
     protected CacheStat cacheStat;
     private String cacheName;
 
@@ -67,6 +66,7 @@ public class DefaultCacheMonitor implements CacheMonitor {
         }
     }
 
+    // 根据CacheEvent的具体类型来执行不同的处理逻辑
     @Override
     public void afterOperation(CacheEvent event) {
         reentrantLock.lock();
