@@ -9,6 +9,7 @@ import com.alicp.jetcache.CacheResult;
 import com.alicp.jetcache.CacheUtil;
 import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.embedded.AbstractEmbeddedCache;
+import com.alicp.jetcache.external.AbstractExternalCache;
 import com.alicp.jetcache.external.ExternalCacheConfig;
 import com.alicp.jetcache.CacheConfigException;
 import org.slf4j.Logger;
@@ -21,7 +22,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * @author huangli
+ * BroadcastManager是个抽象类,
+ * 实现了AutoCloseable接口，其close方法默认为空实现,
+ * 定义了publish及startSubscribe两个抽象方法
+ *
+ * 主要有MockRemoteCacheBuilder的匿名实现、RedisBroadcastManager、LettuceBroadcastManager、SpringDataBroadcastManager、RedissonBroadcastManager这几个实现
  */
 public abstract class BroadcastManager implements AutoCloseable {
     private static Logger logger = LoggerFactory.getLogger(BroadcastManager.class);
@@ -73,6 +78,7 @@ public abstract class BroadcastManager implements AutoCloseable {
                 return;
             }
             if (value instanceof CacheMessage) {
+                // 核心
                 processCacheMessage((CacheMessage) value);
             } else {
                 logger.error("the message is not instance of CacheMessage, class={}", value.getClass());
@@ -83,6 +89,7 @@ public abstract class BroadcastManager implements AutoCloseable {
     }
 
     private void processCacheMessage(CacheMessage cacheMessage) {
+        // 看是不是自己本机, 本机就忽略, 不处理这个消息
         if (sourceId.equals(cacheMessage.getSourceId())) {
             return;
         }
@@ -92,20 +99,34 @@ public abstract class BroadcastManager implements AutoCloseable {
             return;
         }
         Cache absCache = CacheUtil.getAbstractCache(cache);
-        if (!(absCache instanceof MultiLevelCache)) {
-            logger.warn("Cache instance is not MultiLevelCache: {},{}", cacheMessage.getArea(), cacheMessage.getCacheName());
+
+        // 如果是单独的远程缓存就忽略
+        if (absCache instanceof AbstractExternalCache) {
+            logger.warn("Cache instance is AbstractExternalCache: {},{}", cacheMessage.getArea(), cacheMessage.getCacheName());
             return;
         }
-        Cache[] caches = ((MultiLevelCache) absCache).caches();
+
         Set<Object> keys = Stream.of(cacheMessage.getKeys()).collect(Collectors.toSet());
-        for (Cache c : caches) {
-            Cache localCache = CacheUtil.getAbstractCache(c);
-            if (localCache instanceof AbstractEmbeddedCache) {
-                ((AbstractEmbeddedCache) localCache).__removeAll(keys);
-            } else {
-                break;
+
+        // 要区别对待
+        if (absCache instanceof AbstractEmbeddedCache) {
+            ((AbstractEmbeddedCache) absCache).__removeAll(keys);
+        } else {
+            Cache[] caches = ((MultiLevelCache) absCache).caches();
+
+            // 多级缓存, 这边有本地和远程的
+            for (Cache c : caches) {
+                Cache localCache = CacheUtil.getAbstractCache(c);
+                // 只处理本地缓存的
+                if (localCache instanceof AbstractEmbeddedCache) {
+                    ((AbstractEmbeddedCache) localCache).__removeAll(keys);
+                } else {
+                    break;
+                }
             }
         }
+
+
     }
 
 }

@@ -17,9 +17,7 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-/**
- * @author huangli
- */
+// 缓存上下文
 public class CacheContext {
 
     private static Logger logger = LoggerFactory.getLogger(CacheContext.class);
@@ -31,8 +29,19 @@ public class CacheContext {
         }
     };
 
+    /**
+     * JetCache 缓存的管理器（包含很多信息）
+     */
     private ConfigProvider configProvider;
+
+    /**
+     * 缓存的全局配置
+     */
     private GlobalCacheConfig globalCacheConfig;
+
+    /**
+     * 缓存实例管理器
+     */
     private CacheManager cacheManager;
 
     public CacheContext(CacheManager cacheManager, ConfigProvider configProvider, GlobalCacheConfig globalCacheConfig) {
@@ -42,7 +51,10 @@ public class CacheContext {
     }
 
     public CacheInvokeContext createCacheInvokeContext(ConfigMap configMap) {
+        // 创建一个本次调用的上下文
         CacheInvokeContext c = newCacheInvokeContext();
+        // 添加一个函数，后续用于获取缓存实例
+        // 根据注解配置信息获取缓存实例对象，不存在则创建并设置到缓存注解配置类中
         c.setCacheFunction((cic, cac) -> createOrGetCache(cic, cac, configMap));
         return c;
     }
@@ -52,9 +64,10 @@ public class CacheContext {
         if (cache != null) {
             return cache;
         }
-        if (cacheAnnoConfig instanceof CachedAnnoConfig) {
+        if (cacheAnnoConfig instanceof CachedAnnoConfig) { // 缓存注解
+            // 根据配置创建一个缓存实例对象，通过 CacheBuilder
             cache = createCacheByCachedConfig((CachedAnnoConfig) cacheAnnoConfig, invokeContext);
-        } else if ((cacheAnnoConfig instanceof CacheInvalidateAnnoConfig) || (cacheAnnoConfig instanceof CacheUpdateAnnoConfig)) {
+        } else if ((cacheAnnoConfig instanceof CacheInvalidateAnnoConfig) || (cacheAnnoConfig instanceof CacheUpdateAnnoConfig)) { // 更新/使失效缓存注解
             cache = cacheManager.getCache(cacheAnnoConfig.getArea(), cacheAnnoConfig.getName());
             if (cache == null) {
                 CachedAnnoConfig cac = configMap.getByCacheName(cacheAnnoConfig.getArea(), cacheAnnoConfig.getName());
@@ -66,6 +79,7 @@ public class CacheContext {
                     logger.error("Cache operation aborted because can't find cached definition", e);
                     return null;
                 }
+                // 根据配置创建一个缓存实例对象，通过 CacheBuilder
                 cache = createCacheByCachedConfig(cac, invokeContext);
             }
         }
@@ -74,13 +88,17 @@ public class CacheContext {
     }
 
     private Cache createCacheByCachedConfig(CachedAnnoConfig ac, CacheInvokeContext invokeContext) {
+        // 缓存区域
         String area = ac.getArea();
+        // 缓存实例名称
         String cacheName = ac.getName();
-        if (CacheConsts.isUndefined(cacheName)) {
+        if (CacheConsts.isUndefined(cacheName)) {  // 没有定义缓存实例名称
 
+            // 生成缓存实例名称：类名+方法名+(参数类型)
             cacheName = configProvider.createCacheNameGenerator(invokeContext.getHiddenPackages())
                     .generateCacheName(invokeContext.getMethod(), invokeContext.getTargetObject());
         }
+        // 创建缓存实例对象
         Cache cache = __createOrGetCache(ac, area, cacheName);
         return cache;
     }
@@ -114,6 +132,8 @@ public class CacheContext {
             b.penetrationProtectTimeout(ppc.getPenetrationProtectTimeout());
         }
         b.refreshPolicy(cac.getRefreshPolicy());
+
+        // 往下
         return cacheManager.getOrCreateCache(b.build());
     }
 

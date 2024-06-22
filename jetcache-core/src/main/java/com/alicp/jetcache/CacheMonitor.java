@@ -10,6 +10,9 @@ import com.alicp.jetcache.event.CacheEvent;
 @FunctionalInterface
 public interface CacheMonitor {
 
+    /**
+     * 用于消费CacheEvent，它有两个实现类，分别是DefaultCacheMonitor、CacheNotifyMonitor
+     */
     void afterOperation(CacheEvent event);
 
 }

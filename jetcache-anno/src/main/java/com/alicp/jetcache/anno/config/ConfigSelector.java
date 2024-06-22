@@ -32,6 +32,7 @@ public class ConfigSelector extends AdviceModeImportSelector<EnableMethodCache> 
     private String[] getProxyImports() {
         List<String> result = new ArrayList<String>();
         result.add(AutoProxyRegistrar.class.getName());
+        // 重点
         result.add(JetCacheProxyConfiguration.class.getName());
         return result.toArray(new String[result.size()]);
     }

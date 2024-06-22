@@ -87,6 +87,7 @@ public class CreateCacheAnnotationBeanPostProcessor extends AutowiredAnnotationB
                         clear(metadata, pvs);
                     }
                     try {
+                        // 这是核心方法
                         metadata = buildAutowiringMetadata(clazz);
                         this.injectionMetadataCache.put(cacheKey, metadata);
                     } catch (NoClassDefFoundError err) {
@@ -137,6 +138,7 @@ public class CreateCacheAnnotationBeanPostProcessor extends AutowiredAnnotationB
             doWithLocalFields(targetClass, new ReflectionUtils.FieldCallback() {
                 @Override
                 public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
+                    // 判断类属性是否有CreateCache注解
                     CreateCache ann = field.getAnnotation(CreateCache.class);
                     if (ann != null) {
                         if (Modifier.isStatic(field.getModifiers())) {
@@ -145,6 +147,7 @@ public class CreateCacheAnnotationBeanPostProcessor extends AutowiredAnnotationB
                             }
                             return;
                         }
+                        // AutowiredFieldElement是InjectionMetadata.InjectedElement类
                         currElements.add(new AutowiredFieldElement(field, ann));
                     }
                 }
@@ -184,6 +187,7 @@ public class CreateCacheAnnotationBeanPostProcessor extends AutowiredAnnotationB
         @Override
         protected void inject(Object bean, String beanName, PropertyValues pvs) throws Throwable {
             beanFactory.registerDependentBean(beanName, "globalCacheConfig");
+            // CreateCacheWrapper 类创建时会自动创建cache对象
             CreateCacheWrapper wrapper = new CreateCacheWrapper(beanFactory, ann, field);
             field.setAccessible(true);
             field.set(bean, wrapper.getCache());

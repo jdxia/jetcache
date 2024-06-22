@@ -15,11 +15,13 @@ public abstract class EmbeddedCacheAutoInit extends AbstractCacheAutoInit {
         super(cacheTypes);
     }
 
+    // 解析本地缓存单有的配置limit
     @Override
     protected void parseGeneralConfig(CacheBuilder builder, ConfigTree ct) {
         super.parseGeneralConfig(builder, ct);
         EmbeddedCacheBuilder ecb = (EmbeddedCacheBuilder) builder;
 
+        // 设置本地缓存每个缓存实例的缓存数量个数限制（默认100）
         ecb.limit(Integer.parseInt(ct.getProperty("limit", String.valueOf(CacheConsts.DEFAULT_LOCAL_LIMIT))));
     }
 }

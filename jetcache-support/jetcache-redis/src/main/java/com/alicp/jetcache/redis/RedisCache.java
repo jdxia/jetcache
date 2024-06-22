@@ -41,15 +41,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * Created on 2016/10/7.
- *
- * @author huangli
- */
+// 使用Jedis连接Redis，对远程的缓存数据进行操作
+// 实现了以DO_开头的方法，也就是通过Jedis操作缓存数据
 public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     private static Logger logger = LoggerFactory.getLogger(RedisCache.class);
 
+    // 配置对象，包含Redis连接池的相关信息
     protected RedisCacheConfig<K, V> config;
 
     Function<Object, byte[]> valueEncoder;

@@ -44,6 +44,7 @@ public class JetCacheBaseBeans {
         if (metricsCallback != null) {
             cp.setMetricsCallback(metricsCallback);
         }
+        // monitor的init在里面
         cp.init();
         return cp;
     }

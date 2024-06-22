@@ -15,6 +15,7 @@ import java.util.function.Function;
  *
  * @author huangli
  */
+// JSR107 style API, JSR107的javax.cache.Cache接口一致的方法
 public interface Cache<K, V> extends Closeable {
 
     Logger logger = LoggerFactory.getLogger(Cache.class);
@@ -22,17 +23,17 @@ public interface Cache<K, V> extends Closeable {
     //-----------------------------JSR 107 style API------------------------------------------------
 
     /**
-     * Gets an entry from the cache.
-     * <p>If the cache's builder has specified a {@link CacheLoader} and there is no association in the cache
-     * , it will attempt to load the entry.</p>
-     * <p>If error occurs during cache access, the method return null instead of throwing an exception.</p>
-     * @param key the key whose associated value is to be returned
-     * @return the associated value. null may indicates: <ul>
-     *     <li>the entry does not exist or expired</li>
-     *     <li>the entry value is null</li>
-     *     <li>error occurs during cache access(no exception throws)</li>
+     * 从缓存中获取一个条目。
+     * <p>如果缓存的构造器指定了一个{@link CacheLoader}，并且缓存中没有关联，
+     * 它会尝试加载该条目。</p>
+     * <p>如果在缓存访问过程中发生错误，方法会返回null而不是抛出异常。</p>
+     * @param key 要返回其关联值的键
+     * @return 与指定键关联的值。null可能表示：<ul>
+     *     <li>条目不存在或已过期</li>
+     *     <li>条目的值为null</li>
+     *     <li>在缓存访问过程中发生错误（不抛出异常）</li>
      * </ul>
-     * @throws CacheInvokeException only if loader throws an exception
+     * @throws CacheInvokeException 仅当加载器抛出异常时
      * @see CacheLoader
      * @see #GET(Object)
      */
@@ -46,14 +47,13 @@ public interface Cache<K, V> extends Closeable {
     }
 
     /**
-     * Gets a collection of entries from the Cache, returning them as Map of the values associated with
-     * the set of keys requested.
-     * <p>If the cache's builder has specified a {@link CacheLoader} and there is no association in the cache
-     * , it will attempt to load the entry.</p>
-     * <p>If error occurs during cache access, the method will not throw an exception.</p>
-     * @param keys The keys whose associated values are to be returned.
-     * @return A map of entries that were found for the given keys. Keys not found in the cache are not in the returned map.
-     * @throws CacheInvokeException only if loader throws an exception
+     * 从缓存中获取一组条目，将它们作为与请求的键集相关联的值的Map返回。
+     * <p>如果缓存的构造器指定了一个{@link CacheLoader}，并且缓存中没有关联，
+     * 它会尝试加载条目。</p>
+     * <p>如果在缓存访问过程中发生错误，方法不会抛出异常。</p>
+     * @param keys 要返回其关联值的键集合。
+     * @return 为给定键找到的条目的映射。在缓存中未找到的键不包含在返回的映射中。
+     * @throws CacheInvokeException 仅当加载器抛出异常时
      * @see CacheLoader
      * @see #GET_ALL(Set)
      */
@@ -63,11 +63,11 @@ public interface Cache<K, V> extends Closeable {
     }
 
     /**
-     * Associates the specified value with the specified key in the cache.
-     * <p>If error occurs during cache access, the method will not throw an exception.</p>
-     * <p>if the implementation supports asynchronous operation, the cache operation of this method is asynchronous.</p>
-     * @param key key with which the specified value is to be associated
-     * @param value value to be associated with the specified key
+     * 将指定的值与指定的键在缓存中关联起来。
+     * <p>如果在缓存访问过程中发生错误，方法不会抛出异常。</p>
+     * <p>如果实现支持异步操作，此方法的缓存操作为异步。</p>
+     * @param key 与指定值关联的键
+     * @param value 要与指定键关联的值
      * @see #PUT(Object, Object)
      */
     default void put(K key, V value) {
@@ -75,10 +75,10 @@ public interface Cache<K, V> extends Closeable {
     }
 
     /**
-     * Copies all of the entries from the specified map to the cache.
-     * <p>If error occurs during cache access, the method will not throw an exception.</p>
-     * <p>if the implementation supports asynchronous operation, the cache operation of this method is asynchronous.</p>
-     * @param map mappings to be stored in this cache.
+     * 将指定映射中的所有条目复制到缓存中。
+     * <p>如果在缓存访问过程中发生错误，方法不会抛出异常。</p>
+     * <p>如果实现支持异步操作，此方法的缓存操作为异步。</p>
+     * @param map 要存储在此缓存中的映射。
      * @see #PUT_ALL(Map)
      */
     default void putAll(Map<? extends K, ? extends V> map) {
@@ -86,16 +86,15 @@ public interface Cache<K, V> extends Closeable {
     }
 
     /**
-     * Atomically associates the specified key with the given value if it is not already associated with a value.
-     * <p>If error occurs during cache access, the method will not throw an exception.</p>
-     * <p>{@link MultiLevelCache} does not support this method.</p>
-     * @param key key with which the specified value is to be associated
-     * @param value value to be associated with the specified key
-     * @return true if a value was set, false if the KV association does not exists in the cache,
-     *         or error occurs during cache access.
+     * 原子地将指定的键与给定的值关联，如果它还没有与一个值关联的话。
+     * <p>如果在缓存访问过程中发生错误，方法不会抛出异常。</p>
+     * <p>{@link MultiLevelCache} 不支持此方法。</p>
+     * @param key 要与指定的值关联的键
+     * @param value 要与指定的键关联的值
+     * @return 如果设置了值，则为true；如果KV关联在缓存中不存在，或在缓存访问过程中发生错误，则为false。
      * @see #PUT_IF_ABSENT(Object, Object, long, TimeUnit)
      */
-    default boolean putIfAbsent(K key, V value) {
+    default boolean putIfAbsent(K key, V value) {  // 多级缓存MultiLevelCache不支持此方法
         CacheResult result = PUT_IF_ABSENT(key, value, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
         return result.getResultCode() == CacheResultCode.SUCCESS;
     }
@@ -154,22 +153,21 @@ public interface Cache<K, V> extends Closeable {
     CacheConfig<K, V> config();
 
     /**
-     * Use this cache attempt to acquire a exclusive lock specified by the key, this method will not block.
-     * examples:
+     * 尝试使用缓存获取指定键的独占锁，此方法不会阻塞。
+     * 用法示例：
      * <pre>
      *   try(AutoReleaseLock lock = cache.tryLock("MyKey",100, TimeUnit.SECONDS)){
      *      if(lock != null){
-     *          // do something
+     *          // 执行某些操作
      *      }
      *   }
      * </pre>
-     * <p>{@link MultiLevelCache} will use the last level cache to support this operation.</p>
-     * @param key      lockKey
-     * @param expire   lock expire time
-     * @param timeUnit lock expire time unit
-     * @return an AutoReleaseLock(implements java.lang.AutoCloseable) instance if success.
-     *         or null if the attempt fails, which indicates there is an another thread/process/server has the lock,
-     *         or error occurs during cache access.
+     * <p>{@link MultiLevelCache} 将使用最后一级缓存来支持此操作。</p>
+     * @param key      锁键
+     * @param expire   锁的过期时间
+     * @param timeUnit 锁的过期时间单位
+     * @return 如果成功获取锁，则返回一个 AutoReleaseLock 实例（实现了 java.lang.AutoCloseable 接口）。
+     *         如果尝试失败（表示另一个线程/进程/服务器已持有锁），或在访问缓存时发生错误，则返回 null。
      * @see #tryLockAndRun(Object, long, TimeUnit, Runnable)
      */
     @SuppressWarnings("unchecked")
@@ -177,31 +175,42 @@ public interface Cache<K, V> extends Closeable {
         if (key == null) {
             return null;
         }
+        // 生成唯一的UUID作为锁标识
         final String uuid = UUID.randomUUID().toString();
+        // 计算锁的过期时间戳
         final long expireTimestamp = System.currentTimeMillis() + timeUnit.toMillis(expire);
+        // 获取缓存配置
         final CacheConfig config = config();
 
-
-        AutoReleaseLock lock = () -> {
+        // 定义一个AutoReleaseLock，它包含解锁逻辑
+        AutoReleaseLock lock = () -> { // 创建一把会自动释放资源的锁，实现其 close() 方法
             int unlockCount = 0;
+            // 尝试解锁次数
             while (unlockCount++ < config.getTryLockUnlockCount()) {
-                if(System.currentTimeMillis() < expireTimestamp) {
+                // 如果锁未过期，则尝试解锁
+                if(System.currentTimeMillis() < expireTimestamp) { // 这把锁还没有过期，则删除
+                    // 删除对应的 Key 值
+                    // 出现的结果：成功，失败，Key 不存在
                     CacheResult unlockResult = REMOVE(key);
+                    // 解锁结果处理
                     if (unlockResult.getResultCode() == CacheResultCode.FAIL
                             || unlockResult.getResultCode() == CacheResultCode.PART_SUCCESS) {
+                        // 删除对应的 Key 值过程中出现了异常，则重试
                         logger.info("[tryLock] [{} of {}] [{}] unlock failed. Key={}, msg = {}",
                                 unlockCount, config.getTryLockUnlockCount(), uuid, key, unlockResult.getMessage());
                         // retry
-                    } else if (unlockResult.isSuccess()) {
+                        // 重试解锁
+                    } else if (unlockResult.isSuccess()) { // 释放成功
                         logger.debug("[tryLock] [{} of {}] [{}] successfully release the lock. Key={}",
                                 unlockCount, config.getTryLockUnlockCount(), uuid, key);
                         return;
-                    } else {
+                    } else {  // 锁已经被释放了
                         logger.warn("[tryLock] [{} of {}] [{}] unexpected unlock result: Key={}, result={}",
                                 unlockCount, config.getTryLockUnlockCount(), uuid, key, unlockResult.getResultCode());
                         return;
                     }
                 } else {
+                    // 锁已过期
                     logger.info("[tryLock] [{} of {}] [{}] lock already expired: Key={}",
                             unlockCount, config.getTryLockUnlockCount(), uuid, key);
                     return;
@@ -211,25 +220,37 @@ public interface Cache<K, V> extends Closeable {
 
         int lockCount = 0;
         Cache cache = this;
+        // 尝试加锁次数
         while (lockCount++ < config.getTryLockLockCount()) {
+            // 尝试添加锁
+            // 该方法仅在键不存在时才会添加成功，否则会添加失败。PUT_IF_ABSENT添加锁不成功有两种可能，
+            // 即已经存在该键，或者是缓存中没有该键，但是因为特殊原因（如网络原因导致写入Redis失败）导致写入键值失败。
+            // 如果缓存中存在该键，则获取锁失败，返回null。否则会继续尝试获取锁信息
             CacheResult lockResult = cache.PUT_IF_ABSENT(key, uuid, expire, timeUnit);
-            if (lockResult.isSuccess()) {
+            // 加锁结果处理
+            if (lockResult.isSuccess()) {  // 成功获取到锁
                 logger.debug("[tryLock] [{} of {}] [{}] successfully get a lock. Key={}",
                         lockCount, config.getTryLockLockCount(), uuid, key);
                 return lock;
             } else if (lockResult.getResultCode() == CacheResultCode.FAIL || lockResult.getResultCode() == CacheResultCode.PART_SUCCESS) {
+                // 缓存访问失败时的处理逻辑
                 logger.info("[tryLock] [{} of {}] [{}] cache access failed during get lock, will inquiry {} times. Key={}, msg={}",
                         lockCount, config.getTryLockLockCount(), uuid,
                         config.getTryLockInquiryCount(), key, lockResult.getMessage());
                 int inquiryCount = 0;
+                // 尝试查询次数
                 while (inquiryCount++ < config.getTryLockInquiryCount()) {
+                    // 尝试查询锁状态
                     CacheGetResult inquiryResult = cache.GET(key);
+                    // 查询结果处理
                     if (inquiryResult.isSuccess()) {
                         if (uuid.equals(inquiryResult.getValue())) {
+                            // 成功获得锁
                             logger.debug("[tryLock] [{} of {}] [{}] successfully get a lock after inquiry. Key={}",
                                     inquiryCount, config.getTryLockInquiryCount(), uuid, key);
                             return lock;
                         } else {
+                            // 不是锁的所有者
                             logger.debug("[tryLock] [{} of {}] [{}] not the owner of the lock, return null. Key={}",
                                     inquiryCount, config.getTryLockInquiryCount(), uuid, key);
                             return null;
@@ -238,16 +259,19 @@ public interface Cache<K, V> extends Closeable {
                         logger.info("[tryLock] [{} of {}] [{}] inquiry failed. Key={}, msg={}",
                                 inquiryCount, config.getTryLockInquiryCount(), uuid, key, inquiryResult.getMessage());
                         // retry inquiry
+                        // 重试查询
                     }
                 }
             } else {
                 // others holds the lock
+                // 已存在表示该锁被其他人占有
                 logger.debug("[tryLock] [{} of {}] [{}] others holds the lock, return null. Key={}",
                         lockCount, config.getTryLockLockCount(), uuid, key);
                 return null;
             }
         }
 
+        // 所有尝试均未成功获得锁
         logger.debug("[tryLock] [{}] return null after {} attempts. Key={}", uuid, config.getTryLockLockCount(), key);
         return null;
     }
@@ -267,9 +291,17 @@ public interface Cache<K, V> extends Closeable {
      * @param action the action need to execute
      * @return true if successfully get the lock and the action is executed
      */
+    /**
+     * tryLockAndRun方法会非堵塞的尝试获取一把AutoReleaseLock分布式锁（非严格）,获取过程：
+     *
+     * 尝试往Redis中设置（已存在无法设置）一个键值对，key为缓存key_#RL#，value为UUID，并设置这个键值对的过期时间为60秒（默认）
+     * 如果获取到锁后进行加载任务，也就是重新加载方法并更新远程缓存
+     * 该锁实现了java.lang.AutoCloseable接口，使用try-with-resource方式，在执行完加载任务后会自动释放资源，也就是调用close方法将获取锁过程中设置的键值对从Redis中删除
+     * 在RefreshCache中会调用该方法，因为如果存在远程缓存需要刷新则需要采用分布式锁的方式
+     */
     default boolean tryLockAndRun(K key, long expire, TimeUnit timeUnit, Runnable action){
-        try (AutoReleaseLock lock = tryLock(key, expire, timeUnit)) {
-            if (lock != null) {
+        try (AutoReleaseLock lock = tryLock(key, expire, timeUnit)) { // 尝试获取锁
+            if (lock != null) { // 获取到锁则执行下面的任务
                 action.run();
                 return true;
             } else {
@@ -301,11 +333,10 @@ public interface Cache<K, V> extends Closeable {
     MultiGetResult<K, V> GET_ALL(Set<? extends K> keys);
 
     /**
-     * If there is a value associated with the key, return the value;
-     * otherwise use the loader load the value and return, and then update the cache.
-     * @param key the key
-     * @param loader the value loader
-     * @return the value
+     * 如果与给定键关联的有值，则返回该值；否则使用加载器加载值并返回，然后更新缓存。
+     * @param key 键
+     * @param loader 值加载器
+     * @return 与键关联的值
      * @see CacheConfig#isCacheNullValue()
      */
     default V computeIfAbsent(K key, Function<K, V> loader) {
@@ -313,24 +344,22 @@ public interface Cache<K, V> extends Closeable {
     }
 
     /**
-     * If there is a value associated with the key, return the value;
-     * otherwise use the loader load the value and return, and then update the cache.
-     * @param key the key
-     * @param loader the value loader
-     * @param cacheNullWhenLoaderReturnNull true if null value returned by loader should put into cache use the key
-     * @return the value
+     * 如果与给定键关联的有值，则返回该值；否则使用加载器加载值并返回，然后根据参数决定是否更新缓存。
+     * @param key 键
+     * @param loader 值加载器
+     * @param cacheNullWhenLoaderReturnNull 当加载器返回null时，是否将null值放入缓存
+     * @return 与键关联的值
      */
     V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull);
 
     /**
-     * If there is a value associated with the key, return the value;
-     * otherwise use the loader load the value and return, and then update the cache.
-     * @param key the key
-     * @param loader the value loader
-     * @param cacheNullWhenLoaderReturnNull true if null value returned by loader should put into cache use the key
-     * @param expireAfterWrite the TTL(time to live) of the KV association
-     * @param timeUnit the time unit of expireAfterWrite
-     * @return the value
+     * 如果与给定键关联的有值，则返回该值；否则使用加载器加载值并返回，然后根据参数决定是否更新缓存，并设置过期时间。
+     * @param key 键
+     * @param loader 值加载器
+     * @param cacheNullWhenLoaderReturnNull 当加载器返回null时，是否将null值放入缓存
+     * @param expireAfterWrite 缓存项的TTL（生存时间）
+     * @param timeUnit expireAfterWrite的时间单位
+     * @return 与键关联的值
      */
     V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull, long expireAfterWrite, TimeUnit timeUnit);
 
@@ -406,54 +435,49 @@ public interface Cache<K, V> extends Closeable {
         return PUT_ALL(map, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
     }
 
+
     /**
-     * Copies all of the entries from the specified map to the cache.
-     * <p>if the implementation supports asynchronous operation, the cache access may not completed after this method
-     * return. The invoke of getResultCode()/isSuccess()/getMessage() on the result will block until cache
-     * operation is completed. Call future() method on the result will get a CompletionStage instance for asynchronous
-     * programming.</p>
-     * @param map mappings to be stored in this cache.
-     * @param expireAfterWrite the TTL(time to live) of the KV association
-     * @param timeUnit the time unit of expireAfterWrite
-     * @return the result
+     * 将指定映射中的所有条目复制到缓存中。
+     * <p>如果实现支持异步操作，调用此方法后缓存访问可能并未完成。
+     * 可以通过调用结果的getResultCode()/isSuccess()/getMessage()方法进行阻塞等待直到缓存操作完成。
+     * 调用结果的future()方法将获取用于异步编程的CompletionStage实例。</p>
+     * @param map 要存储在缓存中的映射。
+     * @param expireAfterWrite KV关联的TTL（生存时间）
+     * @param timeUnit expireAfterWrite的时间单位
+     * @return 操作结果
      */
     CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit);
 
     /**
-     * Removes the mapping for a key from this cache if it is present.
-     * <p>if the implementation supports asynchronous operation, the cache access may not completed after this method
-     * return. The invoke of getResultCode()/isSuccess()/getMessage() on the result will block until cache
-     * operation is completed. Call future() method on the result will get a CompletionStage instance for asynchronous
-     * programming.</p>
-     * @param key key whose mapping is to be removed from the cache
-     * @return the result
+     * 如果缓存中存在指定键的映射，则从缓存中移除该映射。
+     * <p>如果实现支持异步操作，调用此方法后缓存访问可能并未完成。
+     * 可以通过调用结果的getResultCode()/isSuccess()/getMessage()方法进行阻塞等待直到缓存操作完成。
+     * 调用结果的future()方法将获取用于异步编程的CompletionStage实例。</p>
+     * @param key 要从缓存中移除映射的键
+     * @return 操作结果
      */
     CacheResult REMOVE(K key);
 
     /**
-     * Removes entries for the specified keys.
-     * <p>if the implementation supports asynchronous operation, the cache access may not completed after this method
-     * return. The invoke of getResultCode()/isSuccess()/getMessage() on the result will block until cache
-     * operation is completed. Call future() method on the result will get a CompletionStage instance for asynchronous
-     * programming.</p>
-     * @param keys the keys to remove
-     * @return the result
+     * 移除指定键的映射。
+     * <p>如果实现支持异步操作，调用此方法后缓存访问可能并未完成。
+     * 可以通过调用结果的getResultCode()/isSuccess()/getMessage()方法进行阻塞等待直到缓存操作完成。
+     * 调用结果的future()方法将获取用于异步编程的CompletionStage实例。</p>
+     * @param keys 要移除的键集合
+     * @return 操作结果
      */
     CacheResult REMOVE_ALL(Set<? extends K> keys);
 
     /**
-     * If the specified key is not already associated with a value, associate it with the given value.
-     * <p>if the implementation supports asynchronous operation, the cache access may not completed after this method
-     * return. The invoke of getResultCode()/isSuccess()/getMessage() on the result will block until cache
-     * operation is completed. Call future() method on the result will get a CompletionStage instance for asynchronous
-     * programming.</p>
-     * @param key key with which the specified value is to be associated
-     * @param value value to be associated with the specified key
-     * @param expireAfterWrite the TTL(time to live) of the KV association
-     * @param timeUnit the time unit of expireAfterWrite
-     * @return SUCCESS if the specified key is not already associated with a value,
-     * or EXISTS if the specified key is already associated with a value,
-     * or FAIL if error occurs.
+     * 如果指定键尚未与值关联，则将其与给定值关联。
+     * <p>如果实现支持异步操作，调用此方法后缓存访问可能并未完成。
+     * 可以通过调用结果的getResultCode()/isSuccess()/getMessage()方法进行阻塞等待直到缓存操作完成。
+     * 调用结果的future()方法将获取用于异步编程的CompletionStage实例。</p>
+     * @param key 与指定值关联的键
+     * @param value 要与指定键关联的值
+     * @param expireAfterWrite KV关联的TTL（生存时间）
+     * @param timeUnit expireAfterWrite的时间单位
+     * @return 如果指定键尚未与值关联，则返回SUCCESS；如果指定键已与值关联，则返回EXISTS；如果发生错误，则返回FAIL。
      */
     CacheResult PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit);
 

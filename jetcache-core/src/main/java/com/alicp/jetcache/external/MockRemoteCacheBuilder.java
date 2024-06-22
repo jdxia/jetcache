@@ -35,6 +35,7 @@ public class MockRemoteCacheBuilder<T extends ExternalCacheBuilder<T>> extends E
         return true;
     }
 
+    // 创建了一个匿名的BroadcastManager，其publish返回CacheResult.SUCCESS_WITHOUT_MSG，其startSubscribe设置subscribeStart为true
     @Override
     public BroadcastManager createBroadcastManager(CacheManager cacheManager) {
         return new BroadcastManager(cacheManager) {

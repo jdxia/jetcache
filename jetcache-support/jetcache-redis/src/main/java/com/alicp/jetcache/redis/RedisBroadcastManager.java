@@ -50,6 +50,7 @@ public class RedisBroadcastManager extends BroadcastManager {
         }
     }
 
+    // 创建Thread并执行runSubThread方法；其publish方法主要是将value发布到指定的channel
     @Override
     public void startSubscribe() {
         reentrantLock.lock();
@@ -68,6 +69,7 @@ public class RedisBroadcastManager extends BroadcastManager {
         }
     }
 
+    // 通过while循环执行runSubThread0，它主要是执行subscribe(cacheMessagePubSub, channel)方法
     private void runSubThread() {
         while (!closed) {
             runSubThread0();
@@ -123,6 +125,7 @@ public class RedisBroadcastManager extends BroadcastManager {
     }
 
 
+    // 对于subscribe的true则执行cacheMessagePubSub.unsubscribe(channel)
     @Override
     public void close() {
         reentrantLock.lock();

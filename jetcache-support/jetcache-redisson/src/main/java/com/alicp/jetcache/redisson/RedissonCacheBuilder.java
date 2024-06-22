@@ -2,7 +2,9 @@ package com.alicp.jetcache.redisson;
 
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
+import com.alicp.jetcache.mq.JetCacheMQConsumerStarter;
 import com.alicp.jetcache.support.BroadcastManager;
+import org.apache.rocketmq.client.core.RocketMQClientTemplate;
 import org.redisson.api.RedissonClient;
 
 /**
@@ -47,6 +49,23 @@ public class RedissonCacheBuilder<T extends ExternalCacheBuilder<T>> extends Ext
     @Override
     public BroadcastManager createBroadcastManager(final CacheManager cacheManager) {
         final RedissonCacheConfig<?, ?> c = (RedissonCacheConfig<?, ?>) this.getConfig().clone();
-        return new RedissonBroadcastManager(cacheManager, c);
+//        return new RedissonBroadcastManager(cacheManager, c);
+        return new MQBroadcastManager(cacheManager, c);
     }
+
+    public T setRocketMQClientTemplate(RocketMQClientTemplate rocketMQClientTemplate) {
+        this.getConfig().setRocketMQClientTemplate(rocketMQClientTemplate);
+        return self();
+    }
+
+    public T setMQConsumerConfig(JetCacheMQConsumerStarter jetCacheMQConsumerConfig) {
+        this.getConfig().setMqConsumerStarter(jetCacheMQConsumerConfig);
+        return self();
+    }
+
+    public T setMqTopic(String mqTopic) {
+        this.getConfig().setMqTopic(mqTopic);
+        return self();
+    }
+
 }

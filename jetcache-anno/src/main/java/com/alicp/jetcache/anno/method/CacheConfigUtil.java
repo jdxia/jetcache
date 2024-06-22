@@ -150,8 +150,15 @@ public class CacheConfigUtil {
         return anno != null;
     }
 
+    /**
+     * 解析方法上的注解，并将解析结果存入CacheInvokeConfig对象
+     * @param cac CacheInvokeConfig对象，用于存储解析结果
+     * @param method 待解析的方法
+     * @return 是否存在有效的注解
+     */
     public static boolean parse(CacheInvokeConfig cac, Method method) {
         boolean hasAnnotation = false;
+        // 解析注解@Cached中的信息
         CachedAnnoConfig cachedConfig = parseCached(method);
         if (cachedConfig != null) {
             cac.setCachedAnnoConfig(cachedConfig);

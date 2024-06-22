@@ -60,6 +60,7 @@ public class MetricsMonitorInstaller extends AbstractLifecycle implements CacheM
             if (mc.caches().length == 2) {
                 Cache local = mc.caches()[0];
                 Cache remote = mc.caches()[1];
+                // 对于MultiLevelCache会分别创建localMonitor、remoteMonitor并添加到对应cache的config中
                 DefaultCacheMonitor localMonitor = new DefaultCacheMonitor(quickConfig.getName() + "_local");
                 local.config().getMonitors().add(localMonitor);
                 DefaultCacheMonitor remoteMonitor = new DefaultCacheMonitor(quickConfig.getName() + "_remote");
@@ -67,7 +68,7 @@ public class MetricsMonitorInstaller extends AbstractLifecycle implements CacheM
                 metricsManager.add(localMonitor, remoteMonitor);
             }
         }
-
+        // 创建DefaultCacheMonitor并添加到cache的config中
         DefaultCacheMonitor monitor = new DefaultCacheMonitor(quickConfig.getName());
         cache.config().getMonitors().add(monitor);
         metricsManager.add(monitor);
