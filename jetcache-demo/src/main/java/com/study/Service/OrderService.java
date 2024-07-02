@@ -46,7 +46,7 @@ public class OrderService {
     @CacheRefresh(refresh = 3,
 //            stopRefreshAfterLastAccess = 3,
             timeUnit = TimeUnit.SECONDS, refreshLockTimeout = 5)
-    @CachePenetrationProtect
+    @CachePenetrationProtect(value = true, timeout = 2)
     public Order createOrder(Order orderParam) {
 
         logger.info("===================== createOrder =====================");
@@ -61,6 +61,7 @@ public class OrderService {
         couter = couter + 1;
         return order;
     }
+
 
 
     public Order useCacheApi(Order orderParam) {
