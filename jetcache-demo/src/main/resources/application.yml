@@ -10,6 +10,9 @@ spring:
   main:
     allow-circular-references: true
     banner-mode: off
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
   #redisson 集群配置
   redis:
     redisson:
@@ -23,7 +26,7 @@ spring:
           failedSlaveReconnectionInterval: 3000
           failedSlaveNodeDetector: !<org.redisson.client.FailedConnectionDetector> {}
           password: "Winter123"
-          subscriptionsPerConnection: 5
+          subscriptionsPerConnection: 10
           clientName: null
           loadBalancer: !<org.redisson.connection.balancer.RoundRobinLoadBalancer> {}
           subscriptionConnectionMinimumIdleSize: 1
@@ -35,18 +38,18 @@ spring:
           readMode: "SLAVE"
           subscriptionMode: "SLAVE"
           nodeAddresses:
-          - "redis://172.30.97.10:6381"
-          - "redis://172.30.97.10:6382"
-          - "redis://172.30.97.10:6383"
-          - "redis://172.30.97.10:6384"
-          - "redis://172.30.97.10:6385"
-          - "redis://172.30.97.10:6386"
+          - "redis://172.30.98.52:6381"
+          - "redis://172.30.98.52:6382"
+          - "redis://172.30.98.52:6383"
+          - "redis://172.30.98.52:6384"
+          - "redis://172.30.98.52:6385"
+          - "redis://172.30.98.52:6386"
           scanInterval: 1000
           pingConnectionInterval: 0
           keepAlive: false
           tcpNoDelay: false
-        threads: 16
-        nettyThreads: 32
+        threads: 0
+        nettyThreads: 0
         transportMode: "NIO"
 
 

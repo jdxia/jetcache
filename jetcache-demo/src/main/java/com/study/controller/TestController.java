@@ -27,7 +27,7 @@ public class TestController {
 
         logger.info("===================== demo =====================");
 
-        Order order = orderService.createOrder(new Order(1, name));
+        Order order = orderService.queryOrderOfLocal(new Order(1, name));
 //        Order order = orderService.createOrder();
         return Optional.ofNullable(order).map(x -> x.toString()).orElse(null);
     }

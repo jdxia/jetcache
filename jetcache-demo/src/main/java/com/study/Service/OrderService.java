@@ -4,7 +4,6 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheGetResult;
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.*;
-import com.alicp.jetcache.template.QuickConfig;
 import com.study.pojo.Order;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -12,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -48,7 +46,7 @@ public class OrderService {
             timeUnit = TimeUnit.SECONDS,
             refreshLockTimeout = 5)
     @CachePenetrationProtect(value = true, timeout = 2)
-    public Order createOrder(Order orderParam) {
+    public Order queryOrderOfLocal(Order orderParam) {
 
         logger.info("===================== createOrder =====================");
 
