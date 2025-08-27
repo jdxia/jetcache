@@ -9,6 +9,7 @@ import com.alicp.jetcache.event.CachePutEvent;
 import com.alicp.jetcache.event.CacheRemoveAllEvent;
 import com.alicp.jetcache.event.CacheRemoveEvent;
 import com.alicp.jetcache.external.AbstractExternalCache;
+import com.alicp.jetcache.support.CacheNotifyMonitor;
 import com.alicp.jetcache.support.SquashedLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,6 +93,9 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
      */
     public void notify(CacheEvent e) {
         List<CacheMonitor> monitors = config().getMonitors();
+        /**
+         * 重点关注 {@link CacheNotifyMonitor}
+         */
         for (CacheMonitor m : monitors) {
             m.afterOperation(e);
         }
