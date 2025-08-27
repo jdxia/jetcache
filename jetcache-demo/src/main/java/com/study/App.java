@@ -9,6 +9,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * jetcache spring 自动装配
  *  {@link com.alicp.jetcache.autoconfigure.JetCacheAutoConfiguration}
+ *
+ *  EnableMethodCache 也要看
  */
 @EnableMethodCache(basePackages = "com.study")
 //@EnableCreateCacheAnnotation

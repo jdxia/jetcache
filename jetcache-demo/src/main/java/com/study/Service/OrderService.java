@@ -41,14 +41,15 @@ public class OrderService {
             key = "#orderParam.name",
             localExpire = 200,
             syncLocal = true, cacheType = CacheType.BOTH, expire = 300, timeUnit = TimeUnit.SECONDS)
-    @CacheRefresh(refresh = 3,
-//            stopRefreshAfterLastAccess = 3,
-            timeUnit = TimeUnit.SECONDS,
-            refreshLockTimeout = 5)
+    // CacheRefresh 是根据key来缓存的, key太多, hashmap里面放的对象就太多
+//    @CacheRefresh(refresh = 3,
+////            stopRefreshAfterLastAccess = 3,
+//            timeUnit = TimeUnit.SECONDS,
+//            refreshLockTimeout = 5)
     @CachePenetrationProtect(value = true, timeout = 2)
     public Order queryOrderOfLocal(Order orderParam) {
 
-        logger.info("===================== createOrder =====================");
+        logger.info("===================== queryOrderOfLocal =====================");
 
         Order order = new Order();
         if (couter % 2 == 0) {
@@ -59,6 +60,12 @@ public class OrderService {
 
         couter = couter + 1;
         return order;
+    }
+
+    @CacheInvalidate(name = "order.",
+            key = "#orderParam.name")
+    public void invalidate(Order orderParam) {
+
     }
 
 
@@ -78,6 +85,5 @@ public class OrderService {
 
         return res;
     }
-
 
 }

@@ -17,6 +17,7 @@ public class ConfigSelector extends AdviceModeImportSelector<EnableMethodCache> 
     public String[] selectImports(AdviceMode adviceMode) {
         switch (adviceMode) {
             case PROXY:
+                // jdk动态代理, 注入一个类
                 return getProxyImports();
             case ASPECTJ:
 //                return getAspectJImports();
@@ -31,6 +32,7 @@ public class ConfigSelector extends AdviceModeImportSelector<EnableMethodCache> 
      */
     private String[] getProxyImports() {
         List<String> result = new ArrayList<String>();
+        // spring的
         result.add(AutoProxyRegistrar.class.getName());
         // 重点
         result.add(JetCacheProxyConfiguration.class.getName());

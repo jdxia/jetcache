@@ -107,6 +107,8 @@ public class CacheNotifyMonitor implements CacheMonitor {
             if (e.getMap() != null) {
                 m.setKeys(e.getMap().keySet().stream().map(k -> convertKey(k, localCache)).toArray());
             }
+
+            // 看这个
             broadcastManager.publish(m);
         } else if (event instanceof CacheRemoveAllEvent) {
             CacheMessage m = new CacheMessage();

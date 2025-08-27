@@ -12,6 +12,10 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+/**
+ *  CommonConfiguration 保存方法与缓存注解配置信息的映射关系
+ *  ConfigSelector 重点
+ */
 @Import({CommonConfiguration.class, ConfigSelector.class}) // 看 ConfigSelector
 public @interface EnableMethodCache {
 

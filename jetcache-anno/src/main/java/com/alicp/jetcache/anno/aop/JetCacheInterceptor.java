@@ -86,7 +86,7 @@ public class JetCacheInterceptor implements MethodInterceptor, ApplicationContex
         // 缓存调用配置
         CacheInvokeConfig cac = null;
         if (obj != null) {
-            // 获取改方法的Key(方法所在类名+方法名+(参数类型)+方法返回类型+_被拦截的类名)
+            // 获取该方法的Key(方法所在类名+方法名+(参数类型)+方法返回类型+_被拦截的类名)
             String key = CachePointcut.getKey(method, obj.getClass());
             // 获取该方法的缓存注解信息，在 Pointcut 中已经对注解进行解析并放入 ConfigMap 中
             cac  = cacheConfigMap.getByMethodInfo(key);
@@ -110,7 +110,8 @@ public class JetCacheInterceptor implements MethodInterceptor, ApplicationContex
 
         // 创建CacheInvokeContext，把方法调用的上下文（传参、方法、对象等）放入CacheInvokeContext对象，然后调用CacheHandler的invoke方法实现真正的功能
         // 为本次调用创建一个上下文对象，包含对应的缓存实例
-        CacheInvokeContext context = configProvider.newContext(cacheManager).createCacheInvokeContext(cacheConfigMap);  // 创建缓存调用上下文
+        // 创建缓存调用上下文
+        CacheInvokeContext context = configProvider.newContext(cacheManager).createCacheInvokeContext(cacheConfigMap);
         context.setTargetObject(invocation.getThis());  // 设置目标对象
         context.setInvoker(invocation::proceed);  // 设置调用者
         context.setMethod(method);  // 设置目标方法

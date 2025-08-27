@@ -32,6 +32,15 @@ public class TestController {
         return Optional.ofNullable(order).map(x -> x.toString()).orElse(null);
     }
 
+    @RequestMapping("/invalidate")
+    public String invalidate(@RequestParam(value = "name", defaultValue = "World") String name) {
+
+        logger.info("===================== demo =====================");
+
+        orderService.invalidate(new Order(1, name));
+        return name;
+    }
+
 
     /**
      * http://127.0.0.1:8083/test?name=398 测试

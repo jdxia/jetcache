@@ -88,6 +88,7 @@ public class CacheHandler implements InvocationHandler {
     }
 
     public static Object invoke(CacheInvokeContext context) throws Throwable {
+        // 没啥用
         if (context.getCacheInvokeConfig().isEnableCacheContext()) {
             try {
                 CacheContextSupport._enable();
@@ -96,7 +97,8 @@ public class CacheHandler implements InvocationHandler {
                 CacheContextSupport._disable();
             }
         } else {
-            return doInvoke(context); // 核心
+            // 核心
+            return doInvoke(context);
         }
     }
 
