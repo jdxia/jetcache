@@ -22,6 +22,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 实现了CacheMonitor接口，其afterOperation方法根据CacheEvent的具体类型来执行不同的处理逻辑，主要是维护CacheStat的相关属性
+ * 统计指标
  */
 public class DefaultCacheMonitor implements CacheMonitor {
 

@@ -78,7 +78,10 @@ public class CacheNotifyMonitor implements CacheMonitor {
             return;
         }
 
-        // 根据不同的event具体类型来构建不同的type的CacheMessage，最后通过broadcastManager.publish(m)去发布消息
+        /**
+         * 根据不同的event具体类型来构建不同的type的CacheMessage，最后通过broadcastManager.publish(m)去发布消息
+         * 订阅是 {@link com.alicp.jetcache.redis.RedisBroadcastManager}
+         */
         if (event instanceof CachePutEvent) {
             CacheMessage m = new CacheMessage();
             m.setArea(area);
@@ -87,6 +90,7 @@ public class CacheNotifyMonitor implements CacheMonitor {
             CachePutEvent e = (CachePutEvent) event;
             m.setType(CacheMessage.TYPE_PUT);
             m.setKeys(new Object[]{convertKey(e.getKey(), localCache)});
+            // 发布消息到广播通道
             broadcastManager.publish(m);
         } else if (event instanceof CacheRemoveEvent) {
             CacheMessage m = new CacheMessage();
@@ -96,6 +100,7 @@ public class CacheNotifyMonitor implements CacheMonitor {
             CacheRemoveEvent e = (CacheRemoveEvent) event;
             m.setType(CacheMessage.TYPE_REMOVE);
             m.setKeys(new Object[]{convertKey(e.getKey(), localCache)});
+            // 发布消息到广播通道
             broadcastManager.publish(m);
         } else if (event instanceof CachePutAllEvent) {
             CacheMessage m = new CacheMessage();
@@ -120,6 +125,8 @@ public class CacheNotifyMonitor implements CacheMonitor {
             if (e.getKeys() != null) {
                 m.setKeys(e.getKeys().stream().map(k -> convertKey(k, localCache)).toArray());
             }
+
+            // 发布消息到广播通道
             broadcastManager.publish(m);
         }
     }

@@ -62,6 +62,8 @@ public class RedisBroadcastManager extends BroadcastManager {
             Thread subThread;
             subThread = new Thread(this::runSubThread, "Sub_" + channelStr);
             subThread.setDaemon(true);
+
+            // 启动订阅线程
             subThread.start();
             this.subscribeThreadStart = true;
         }finally {

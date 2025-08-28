@@ -40,6 +40,9 @@ public class RedissonBroadcastManager extends BroadcastManager {
         reentrantLock.lock();
         try {
             if (this.subscribeId == 0 && Objects.nonNull(this.channel) && !this.channel.isEmpty()) {
+                /**
+                 * 核心 processNotification
+                 */
                 this.subscribeId = this.client.getTopic(this.channel)
                         .addListener(byte[].class, (channel, msg) -> processNotification(msg, this.config.getValueDecoder()));
             }

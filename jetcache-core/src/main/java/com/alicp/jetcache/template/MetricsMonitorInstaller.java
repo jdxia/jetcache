@@ -54,6 +54,9 @@ public class MetricsMonitorInstaller extends AbstractLifecycle implements CacheM
         if (metricsManager == null) {
             return;
         }
+        /**
+         * 如果是 MultiLevelCache（本地+远端两级），会给两层分别安装一个 DefaultCacheMonitor，并再给组合层装一个；然后把这些 monitor 注册进 metricsManager（用于定时汇总/输出）
+         */
         cache = CacheUtil.getAbstractCache(cache);
         if (cache instanceof MultiLevelCache) {
             MultiLevelCache mc = (MultiLevelCache) cache;

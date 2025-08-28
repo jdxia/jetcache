@@ -150,6 +150,7 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
         cache.config().setCachePenetrationProtect(protect);
         cache.config().setPenetrationProtectTimeout(config.getPenetrationProtectTimeout());
 
+        // 循环缓存监控安装器
         for (CacheMonitorInstaller i : cacheBuilderTemplate.getCacheMonitorInstallers()) {
             // 添加监控统计配置, 里面有 syncLocal的配置处理
             i.addMonitors(this, cache, config);
