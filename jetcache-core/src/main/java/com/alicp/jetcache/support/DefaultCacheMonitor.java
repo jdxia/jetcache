@@ -67,9 +67,14 @@ public class DefaultCacheMonitor implements CacheMonitor {
         }
     }
 
-    // 根据CacheEvent的具体类型来执行不同的处理逻辑
+    /**
+     * 监控打印是在 {@link DefaultMetricsManager#start()}
+     *
+     * 根据CacheEvent的具体类型来执行不同的处理逻辑
+     */
     @Override
     public void afterOperation(CacheEvent event) {
+        // 计数器在锁内更新
         reentrantLock.lock();
         try {
             if (event instanceof CacheGetEvent) {

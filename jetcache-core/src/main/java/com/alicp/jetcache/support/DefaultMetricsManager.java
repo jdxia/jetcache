@@ -81,6 +81,10 @@ public class DefaultMetricsManager {
                 return;
             }
             long delay = firstDelay(resetTime, resetTimeUnit);
+            /**
+             * 定时汇总（取各 monitor 的 CacheStat，重置并回调输出）
+             * 任务是cmd, {@link DefaultMetricsManager#cmd}
+             */
             future = JetCacheExecutor.defaultExecutor().scheduleAtFixedRate(
                     cmd, delay, resetTimeUnit.toMillis(resetTime), TimeUnit.MILLISECONDS);
             logger.info("cache stat period at " + resetTime + " " + resetTimeUnit);
