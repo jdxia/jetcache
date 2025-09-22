@@ -332,7 +332,7 @@ public class CacheHandler implements InvocationHandler {
                     return !ExpressionUtil.evalPostCondition(context, cic.getCachedAnnoConfig());  // 根据表达式判断是否禁止缓存更新
                 }
             };
-            // 获取结果
+            // 获取结果, 这个 computeIfAbsent 是核心
             Object result = cache.computeIfAbsent(key, loader);  // 根据key计算缓存结果
             return result;  // 返回缓存结果
         } catch (CacheInvokeException e) {  // 捕获缓存调用异常
