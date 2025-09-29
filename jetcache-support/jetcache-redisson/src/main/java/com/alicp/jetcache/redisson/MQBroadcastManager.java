@@ -108,6 +108,8 @@ public class MQBroadcastManager extends BroadcastManager {
 
                 // rocketmq 发送消息
                 String mqDestination = config.getMqTopic() + ":" + this.channel;
+
+                // 建议不要异步发送
                 CompletableFuture<SendReceipt> sendReceiptCompletableFuture = this.mqClientTemplate.asyncSendNormalMessage(mqDestination, msg, null);
 
                 if (logger.isDebugEnabled() && Objects.nonNull(cacheMessage.getKeys()) && cacheMessage.getKeys().length != 0) {
